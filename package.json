@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Sql Proxy Datasource",
   "scripts": {
-    "build": "grafana-toolkit plugin:build",
+    "build": "npm run copypng && npm run buildplugin",
+    "buildplugin": "grafana-toolkit plugin:build",
+    "copypng": "copyfiles SQLProxyPlugin.png dist",
     "test": "grafana-toolkit plugin:test",
     "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch"
@@ -11,18 +13,18 @@
   "private": true,
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
-    "@grafana/data": "7.1.3",
-    "@grafana/runtime": "7.1.3",
-    "@grafana/toolkit": "7.1.3",
-    "@grafana/ui": "7.1.3",
-    "@types/lodash": "4.14.123",
-    "@types/react": "16.8.16 ",
-    "@types/request-promise-native": "^1.0.17"
+    "@grafana/data": "9.4.12",
+    "@grafana/eslint-config": "^5.0.0",
+    "@grafana/runtime": "9.4.12",
+    "@grafana/toolkit": "9.4.12",
+    "@grafana/ui": "9.4.12",
+    "@types/lodash": "4.14.195",
+    "copyfiles": "^2.4.1"
   },
   "screenshots": [],
   "dependencies": {
-    "codemirror": "^5.51.0",
-    "date-fns": "^2.16.1",
-    "react-codemirror2": "^6.0.0"
+    "@emotion/css": "^11.11.0",
+    "@emotion/react": "^11.11.1",
+    "date-fns": "^2.30.0"
   }
 }

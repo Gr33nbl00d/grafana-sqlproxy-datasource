@@ -2,8 +2,12 @@ import React, { PureComponent } from 'react';
 import { Input, LegacyForms } from '@grafana/ui';
 const { FormField } = LegacyForms;
 
-import { DataSourcePluginOptionsEditorProps, DataSourceJsonData, DataSourceSettings } from '@grafana/data';
-import { css, cx } from 'emotion';
+import {
+  DataSourcePluginOptionsEditorProps,
+  DataSourceJsonData,
+  DataSourceSettings,
+} from '@grafana/data';
+import { css, cx } from '@emotion/css';
 
 interface Props extends DataSourcePluginOptionsEditorProps<DataSourceJsonData> {}
 interface ProxySettings extends DataSourceSettings {
@@ -34,7 +38,12 @@ export class ConfigEditor extends PureComponent<Props, State> {
     { key: 'password', placeholder: 'User Password', style: this.inputStyle, type: 'password' },
   ];
 
-  componentWillMount() {
+  constructor(props: Props, context: any) {
+    super(props, context);
+    this.state = props.options;
+  }
+
+  componentDidMount() {
     this.setState(this.props.options);
   }
 
@@ -56,7 +65,6 @@ export class ConfigEditor extends PureComponent<Props, State> {
     return (
       <Input
         type={input.type}
-        css={input.css}
         className={input.style}
         placeholder={input.placeholder}
         value={this.state.jsonData[input.key]}

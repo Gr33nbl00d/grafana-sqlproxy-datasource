@@ -13,7 +13,7 @@ import {
 
 import { SqlQuery } from './types';
 import { getBackendSrv } from '@grafana/runtime';
-import { format, roundToNearestMinutes } from 'date-fns';
+import { format } from 'date-fns';
 
 export class DataSource extends DataSourceApi<SqlQuery, DataSourceJsonData> {
   /** @ngInject */
@@ -95,7 +95,11 @@ export class DataSource extends DataSourceApi<SqlQuery, DataSourceJsonData> {
       sql = sql.replace(/\$__timeFrom/g, options.startTime.toString());
     }
     if (sql.includes('$__timeTo')) {
-      sql = sql.replace(/\$__timeTo/g, options.endTime?.toString() ?? '');
+      if (options.endTime !== null && options.endTime !== undefined) {
+        sql = sql.replace(/\$__timeTo/g, options.endTime.toString());
+      } else {
+        sql = sql.replace(/\$__timeTo/g, '');
+      }
     }
     return sql;
   }

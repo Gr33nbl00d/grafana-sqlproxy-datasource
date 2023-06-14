@@ -1,60 +1,51 @@
-import React, { Component } from 'react';
-import { DataSource } from '../SqlProxyDatasource';
-import { QueryEditorProps, DataSourceJsonData } from '@grafana/data';
-import { SqlQuery } from 'types';
-import { Controlled as CodeMirror } from 'react-codemirror2';
-
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/darcula.css';
-require('codemirror/mode/sql/sql');
+import React, {Component} from 'react';
+import {DataSource} from '../SqlProxyDatasource';
+import {QueryEditorProps, DataSourceJsonData} from '@grafana/data';
+import {SqlQuery} from 'types';
+import {debounce, DebouncedFunc} from "lodash"
 import './QueryEditor.scss';
+import {TextArea} from '@grafana/ui';
 
 type Props = QueryEditorProps<DataSource, SqlQuery, DataSourceJsonData>;
 
 interface State {
-  sql: string;
+    sql: string;
 }
 
 export class QueryEditor extends Component<Props, State> {
-  constructor(props: QueryEditorProps<DataSource, SqlQuery, DataSourceJsonData>, context: any) {
-    super(props, context);
-    this.state = { sql: props.query.sql };
-  }
+    private triggerDebouncedSqlExecution: DebouncedFunc<() => void>;
 
-  onChange = (editor: any, event: Event) => {
-    const { onChange, query, onRunQuery } = this.props;
-    const sql = this.state.sql;
-    this.setState({ sql });
-    onChange({ ...query, sql });
-    onRunQuery(); // executes the query
-  };
+    constructor(props: QueryEditorProps<DataSource, SqlQuery, DataSourceJsonData>, context: any) {
+        super(props, context);
+        this.state = {sql: props.query.sql};
+        this.triggerDebouncedSqlExecution = debounce(this.triggerSqlExecution, 1000, {leading: false, trailing: true});
+    }
 
-  render() {
-    const { sql } = this.state;
+    componentDidMount() {
+        this.setState({sql: this.props.query.sql});
+    }
 
-    const options = {
-      mode: 'sql',
-      theme: 'darcula',
-    };
+    private triggerSqlExecution() {
+        const sql = this.state.sql;
+        this.props.onChange({...this.props.query, sql});
+        this.props.onRunQuery(); // executes the query
+    }
 
-    return (
-      <>
-        <div className={'sql-query-editor'}>
-          <CodeMirror
-            value={sql}
-            options={options}
-            onBeforeChange={(editor, data, value) => {
-              this.setState({ sql: value });
-            }}
-            onChange={(editor, data, value) => {
-              this.setState({ sql: value });
-            }}
-            onBlur={(editor, event) => {
-              this.onChange(editor, event);
-            }}
-          />
-        </div>
-      </>
-    );
-  }
+    render() {
+        const {sql} = this.state;
+        return (
+            <>
+                <div className={'sql-query-editor'}>
+                    <TextArea
+                        value={sql}
+                        onChange={event => {
+                            this.setState({sql: event.currentTarget.value})
+                            this.triggerDebouncedSqlExecution()
+                        }
+                        }
+                    />
+                </div>
+            </>
+        );
+    }
 }
